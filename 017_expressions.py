@@ -96,6 +96,8 @@ add_one(add_one(add_one(add_one(add_one(add_one(1))))))
 # @TASK: What do you think that evaluates to? And why? Give
 # it a go and find out.
 
+#Output of 7. 
+
 # @TASK: Play around with building complex expressions in
 # the space below.
 

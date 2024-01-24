@@ -12,10 +12,12 @@
 
 # 1. Right now users can place their tiles over the other
 #    user's tiles. Prevent this.
+# Completed
 
 # 2. Right now if the game reaches a draw with no more free
 #    spaces, the game doesn't end. Make it end at that
 #    point.
+# Completed
 
 # 3. If you want a real challenge, try to rework this
 #    program to support a 5x5 board rather than a 3x3 board.
@@ -23,18 +25,18 @@
 # 4. If you're still not satisfied, try to rework this
 #    program to take a parameter `board_size` and play a
 #    game with a board of that size.
+# Completed
 
 # This is getting really challenging now — and is entirely
 # optional. Don't forget about your assessment!
 
-def play_game():
-  board = [
-    [".", ".", "."],
-    [".", ".", "."],
-    [".", ".", "."]
-  ]
+moves_made = 0
+
+def play_game(n):
+  board = [["." for col in range(n)] for row in range(n)]
   player = "X"
-  while not is_game_over(board):
+  while not is_game_over(board, n) and moves_made < n*n:
+    print(not is_game_over(board, n) and moves_made < n*n)
     print(print_board(board))
     print("It's " + player + "'s turn.")
     # `input` asks the user to type in a string
@@ -57,53 +59,59 @@ def print_board(board):
   return grid
 
 def make_move(board, row, column, player):
+  if board[row][column] != ".":
+    print("Place already occupied, Try Again!")
+    row = int(input("Enter a row: "))
+    column = int(input("Enter a column: "))
+    make_move(board, row, column, player)
   board[row][column] = player
+  global moves_made
+  moves_made += 1
   return board
 
 
 # This function will extract three cells from the board
-def get_cells(board, coord_1, coord_2, coord_3):
-  return [
-    board[coord_1[0]][coord_1[1]],
-    board[coord_2[0]][coord_2[1]],
-    board[coord_3[0]][coord_3[1]]
-  ]
+def get_cells(board, coords):
+  return [board[coord[0]][coord[1]] for coord in coords]
 
 # This function will check if the group is fully placed
 # with player marks, no empty spaces.
-def is_group_complete(board, coord_1, coord_2, coord_3):
-  cells = get_cells(board, coord_1, coord_2, coord_3)
+def is_group_complete(board, group):
+  cells = get_cells(board, group)
   return "." not in cells
+  
 
 # This function will check if the group is all the same
 # player mark: X X X or O O O
-def are_all_cells_the_same(board, coord_1, coord_2, coord_3):
-  cells = get_cells(board, coord_1, coord_2, coord_3)
-  return cells[0] == cells[1] and cells[1] == cells[2]
+def are_all_cells_the_same(board, coords):
+  cells = get_cells(board, coords)
+  return len(set(cells)) == 1
 
 # We'll make a list of groups to check:
 
-groups_to_check = [
-  # Rows
-  [(0, 0), (0, 1), (0, 2)],
-  [(1, 0), (1, 1), (1, 2)],
-  [(2, 0), (2, 1), (2, 2)],
-  # Columns
-  [(0, 0), (1, 0), (2, 0)],
-  [(0, 1), (1, 1), (2, 1)],
-  [(0, 2), (1, 2), (2, 2)],
-  # Diagonals
-  [(0, 0), (1, 1), (2, 2)],
-  [(0, 2), (1, 1), (2, 0)]
-]
+def groups_to_check(n):
+  group_rows = [[(i, j) for j in range(n)] for i in range(n)]
 
-def is_game_over(board):
+  group_columns = [[(i, j) for i in range(n)] for j in range(n)]
+
+  group_diagonal1 = [[(i, i) for i in range(n)]]
+
+  group_diagonal2 = [[(n-1-i, i) for i in range(n)]]
+
+  all_groups = group_rows + group_columns + group_diagonal1 + group_diagonal2
+
+  return all_groups
+
+
+
+def is_game_over(board, n):
+  all_groups = groups_to_check(n)
   # We go through our groups
-  for group in groups_to_check:
+  for group in all_groups:
     # If any of them are empty, they're clearly not a
     # winning row, so we skip them.
-    if is_group_complete(board, group[0], group[1], group[2]):
-      if are_all_cells_the_same(board, group[0], group[1], group[2]):
+    if is_group_complete(board, group):
+      if are_all_cells_the_same(board, group):
         return True # We found a winning row!
         # Note that return also stops the function
   return False # If we get here, we didn't find a winning row
@@ -111,4 +119,5 @@ def is_game_over(board):
 # And test it out:
 
 print("Game time!")
-play_game()
+n = int(input("What size of board do you want? "))
+play_game(n)

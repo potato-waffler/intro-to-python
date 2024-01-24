@@ -12,6 +12,7 @@ print(f"b is {b}")
 # run the code and see.
 
 # Was it what you expected?
+# Yes, while a is intialially assigned 10, the statement a = b changes that value to that of b which is 20. 
 
 # Try to puzzle it out, and then move on to
 # 020_state_tables.py
